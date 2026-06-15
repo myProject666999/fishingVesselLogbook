@@ -1,0 +1,21 @@
+{
+  "name": "fishing-vessel-logbook-backend",
+  "version": "1.0.0",
+  "description": "渔船捕捞作业电子日志系统 - 后端服务",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js",
+    "debug": "DEBUG=app:* node src/app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.6.0",
+    "redis": "^4.6.8",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "debug": "^4.3.4",
+    "dotenv": "^16.3.1",
+    "moment": "^2.29.4"
+  }
+}
