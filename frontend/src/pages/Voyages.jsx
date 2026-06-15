@@ -55,7 +55,7 @@ function Voyages() {
       const values = await form.validateFields();
       await voyageAPI.create({
         ...values,
-        departure_time: values.departure_time?.toISOString()
+        departure_time: values.departure_time ? values.departure_time.format('YYYY-MM-DD HH:mm:ss') : null
       });
       message.success('创建成功');
       setModalVisible(false);
@@ -85,7 +85,7 @@ function Voyages() {
     try {
       await voyageAPI.finish(record.id, {
         arrival_port: record.departure_port,
-        arrival_time: new Date().toISOString()
+        arrival_time: dayjs().format('YYYY-MM-DD HH:mm:ss')
       });
       message.success('航次已结束');
       loadData();

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Tabs, Table, Button, Modal, Form, Input, DatePicker, message, Popconfirm, Space, Card, Row, Col } from 'antd';
+import { Tabs, Table, Button, Modal, Form, Input, InputNumber, DatePicker, message, Popconfirm, Space, Card, Row, Col } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SafetyOutlined } from '@ant-design/icons';
 import { noFishingAPI } from '../api';
 import dayjs from 'dayjs';
@@ -320,7 +320,7 @@ function NoFishing() {
             <Input.TextArea rows={3} placeholder="请输入描述" />
           </Form.Item>
           <Form.Item name="is_active" label="是否启用">
-            <Input.Number min={0} max={1} placeholder="1-启用 0-禁用" />
+            <InputNumber min={0} max={1} placeholder="1-启用 0-禁用" />
           </Form.Item>
         </Form>
       </Modal>
@@ -343,7 +343,7 @@ function NoFishing() {
             <Input.TextArea rows={3} placeholder="请输入描述" />
           </Form.Item>
           <Form.Item name="is_active" label="是否启用">
-            <Input.Number min={0} max={1} placeholder="1-启用 0-禁用" />
+            <InputNumber min={0} max={1} placeholder="1-启用 0-禁用" />
           </Form.Item>
         </Form>
       </Modal>
