@@ -95,7 +95,12 @@ router.delete('/zones/:id', async (req, res) => {
 router.get('/periods', async (req, res) => {
   try {
     debug('获取禁渔期列表');
-    const [rows] = await db.query('SELECT * FROM no_fishing_periods ORDER BY id DESC');
+    const [rows] = await db.query(`
+      SELECT id, period_name, zone_ids, description, is_active, created_at, updated_at,
+             DATE_FORMAT(start_date, '%Y-%m-%d') as start_date,
+             DATE_FORMAT(end_date, '%Y-%m-%d') as end_date
+      FROM no_fishing_periods ORDER BY id DESC
+    `);
     res.json({ success: true, data: rows });
   } catch (err) {
     debug('获取禁渔期失败:', err.message);
@@ -107,7 +112,12 @@ router.get('/periods/:id', async (req, res) => {
   try {
     const { id } = req.params;
     debug('获取禁渔期详情: id=%s', id);
-    const [rows] = await db.query('SELECT * FROM no_fishing_periods WHERE id = ?', [id]);
+    const [rows] = await db.query(`
+      SELECT id, period_name, zone_ids, description, is_active, created_at, updated_at,
+             DATE_FORMAT(start_date, '%Y-%m-%d') as start_date,
+             DATE_FORMAT(end_date, '%Y-%m-%d') as end_date
+      FROM no_fishing_periods WHERE id = ?
+    `, [id]);
     if (rows.length === 0) {
       return res.status(404).json({ success: false, message: '禁渔期不存在' });
     }

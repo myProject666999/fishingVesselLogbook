@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Select, Input, InputNumber, DatePicker, message, Popconfirm, Space } from 'antd';
+import { Table, Button, Modal, Form, Select, Input, InputNumber, DatePicker, message, Popconfirm, Space, Tag } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { catchLogAPI, voyageAPI, buyerAPI } from '../api';
+import { catchLogAPI, voyageAPI, buyerAPI, noFishingAPI } from '../api';
 import dayjs from 'dayjs';
 
 function CatchLogs() {
@@ -10,6 +10,7 @@ function CatchLogs() {
   const [loading, setLoading] = useState(false);
   const [voyages, setVoyages] = useState([]);
   const [buyers, setBuyers] = useState([]);
+  const [noFishingPeriods, setNoFishingPeriods] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [form] = Form.useForm();
@@ -20,6 +21,7 @@ function CatchLogs() {
     loadData();
     loadVoyages();
     loadBuyers();
+    loadNoFishingPeriods();
   }, [page, pageSize]);
 
   const loadData = async () => {
@@ -51,6 +53,49 @@ function CatchLogs() {
     } catch (err) {
       console.error('加载买家列表失败');
     }
+  };
+
+  const loadNoFishingPeriods = async () => {
+    try {
+      const res = await noFishingAPI.getPeriods();
+      const activePeriods = (res.data || []).filter(p => p.is_active === 1);
+      setNoFishingPeriods(activePeriods);
+    } catch (err) {
+      console.error('加载禁渔期列表失败');
+    }
+  };
+
+  const disabledDate = (current) => {
+    if (!current) return false;
+    const currentDate = current.format('YYYY-MM-DD');
+    for (const period of noFishingPeriods) {
+      const startDate = dayjs(period.start_date).format('YYYY-MM-DD');
+      const endDate = dayjs(period.end_date).format('YYYY-MM-DD');
+      if (currentDate >= startDate && currentDate <= endDate) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const dateCellRender = (current) => {
+    if (!current) return null;
+    const currentDate = current.format('YYYY-MM-DD');
+    for (const period of noFishingPeriods) {
+      const startDate = dayjs(period.start_date).format('YYYY-MM-DD');
+      const endDate = dayjs(period.end_date).format('YYYY-MM-DD');
+      if (currentDate >= startDate && currentDate <= endDate) {
+        return (
+          <div style={{ position: 'relative', height: '100%' }}>
+            <div style={{ color: '#ff4d4f', fontWeight: 'bold' }}>
+              {current.date()}
+            </div>
+            <div style={{ fontSize: '10px', color: '#ff4d4f' }}>禁渔</div>
+          </div>
+        );
+      }
+    }
+    return <div>{current.date()}</div>;
   };
 
   const handleAdd = () => {
@@ -169,8 +214,23 @@ function CatchLogs() {
             </Select>
           </Form.Item>
           <Form.Item name="log_date" label="作业日期" rules={[{ required: true, message: '请选择作业日期' }]}>
-            <DatePicker style={{ width: '100%' }} placeholder="请选择作业日期" />
+            <DatePicker 
+              style={{ width: '100%' }} 
+              placeholder="请选择作业日期（禁渔期已标记为红色且不可选）"
+              disabledDate={disabledDate}
+              dateCellRender={dateCellRender}
+            />
           </Form.Item>
+          {noFishingPeriods.length > 0 && (
+            <div style={{ marginBottom: '16px', padding: '12px', background: '#fff2f0', border: '1px solid #ffccc7', borderRadius: '4px' }}>
+              <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', color: '#ff4d4f' }}>⚠️ 禁渔期提醒：</p>
+              {noFishingPeriods.map(p => (
+                <Tag key={p.id} color="error" style={{ marginBottom: '4px' }}>
+                  {p.period_name}: {dayjs(p.start_date).format('YYYY-MM-DD')} 至 {dayjs(p.end_date).format('YYYY-MM-DD')}
+                </Tag>
+              ))}
+            </div>
+          )}
           <Form.Item name="fish_type" label="鱼种" rules={[{ required: true, message: '请输入鱼种' }]}>
             <Input placeholder="请输入鱼种，如：带鱼、黄鱼、对虾等" />
           </Form.Item>

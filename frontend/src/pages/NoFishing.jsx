@@ -183,8 +183,18 @@ function NoFishing() {
   const periodColumns = [
     { title: 'ID', dataIndex: 'id', key: 'id', width: 60 },
     { title: '禁渔期名称', dataIndex: 'period_name', key: 'period_name' },
-    { title: '开始日期', dataIndex: 'start_date', key: 'start_date' },
-    { title: '结束日期', dataIndex: 'end_date', key: 'end_date' },
+    { 
+      title: '开始日期', 
+      dataIndex: 'start_date', 
+      key: 'start_date',
+      render: date => date ? dayjs(date).format('YYYY-MM-DD') : '-'
+    },
+    { 
+      title: '结束日期', 
+      dataIndex: 'end_date', 
+      key: 'end_date',
+      render: date => date ? dayjs(date).format('YYYY-MM-DD') : '-'
+    },
     { title: '描述', dataIndex: 'description', key: 'description' },
     {
       title: '状态',
